@@ -6,6 +6,19 @@ uhh it works, its foss, and it reads log files using efficient techniques. thats
 
 i hope its cross platform? seems to work on linux, windows i hope, macos *maybe*
 
+## installing on windows
+paste into start menu and hit enter:
+
+```
+powershell "Invoke-WebRequest https://raw.githubusercontent.com/An0nDev/safestreak/master/install_windows.ps1" | powershell -noprofile -
+```
+
+you can then double-click on `run.py` in your documents folder --> safestreak-master
+
+(read `install_windows.ps1` to see what the installer does)
+
+
+## other info
 python requirements are requests for mojang/hypixel api and watchdog for log file watching (i think thats it)
 
 cool mc people are:
