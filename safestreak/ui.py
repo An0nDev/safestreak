@@ -23,7 +23,8 @@ class Controls (tkinter.Frame):
     def _edit_settings_after (self):
         SettingsEditor.save (self.app.settings, file_path = self.app.settings_path)
     def _add (self):
-        self.app.container.add_row (self.custom_field_value.get (), pinned = False)
+        with self.app.container_lock:
+            self.app.container.add_row (self.custom_field_value.get (), pinned = False)
         self.custom_field_value.set ("")
 
 class Container (tkinter.Frame):

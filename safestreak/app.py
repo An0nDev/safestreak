@@ -1,5 +1,6 @@
 import math
 import os
+import threading
 import tkinter
 import pathlib
 
@@ -35,11 +36,13 @@ class safestreakApp (tkinter.Tk):
         self.chat_processor = ChatProcessor (self)
         self.log_reader = LogReader (self)
 
+        self.container_lock = threading.Lock ()
         self.container = Container (self)
         self.controls = Controls (self)
         self.controls.grid (row = 2, sticky = "we")
         self.container.grid (row = 3, sticky = "we")
-        self.container.add_row (self.settings.own_ign, pinned = True)
+        with self.container_lock:
+            self.container.add_row (self.settings.own_ign, pinned = True)
 
         self.bottom_text = tkinter.Label (self, text = "BOTTOM TEXT", bg = "black", fg = "white", font = ("Impact", 36))
         self.bottom_text.grid (row = 4, sticky = "we")
