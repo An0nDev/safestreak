@@ -105,7 +105,9 @@ class Container (tkinter.Frame):
         for column in row ["columns"]:
             column.grid_forget ()
         del self.rows [username]
-        self._reindex (self.rows.items ())
+
+        sorted_rows = sorted (self.rows.items (), key = lambda username_and_row: username_and_row [1] ["index_score"], reverse = True)
+        self._reindex (sorted_rows)
     def clear_rows (self, force = False):
         pins = []
         for username in list (self.rows.keys ()):
