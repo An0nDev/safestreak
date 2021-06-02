@@ -19,10 +19,8 @@ class Controls (tkinter.Frame):
         self.custom_add_button = tkinter.Button (self, text = "Add", command = self._add, **self.app.gen_global_widget_opts ())
         self.custom_add_button.grid (row = 0, column = 4, sticky = "NS")
     def _edit_settings (self):
-        print (f"before settings {self.app.settings}")
         SettingsEditor ().edit (self.app.settings, after = self._edit_settings_after)
     def _edit_settings_after (self):
-        print (f"after settings {self.app.settings}")
         SettingsEditor.save (self.app.settings, file_path = self.app.settings_path)
     def _add (self):
         self.app.container.add_row (self.custom_field_value.get (), pinned = False)
