@@ -1,6 +1,6 @@
 # SafeStreak
 
-> "If you know the enemy and know yourself, you need not fear the result of a hundred battles. *-Sun Tzu*
+> "If you know the enemy and know yourself, you need not fear the result of a hundred battles." *-Sun Tzu*
 
 free and open source bedwars stats overlay for lunar client 1.8 to help you keep your winstreak.
 
