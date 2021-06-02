@@ -14,16 +14,16 @@ $OutZipName = "safestreak-master.zip"
 $OutFolder = [Environment]::GetFolderPath("MyDocuments") # gracias https://stackoverflow.com/a/24779668
 $OutSubfolderName = "safestreak-master"
 $OutSubfolderPath = Join-Path $OutFolder $OutSubfolderName
-Write-Output $TempFolder
+# Write-Output $TempFolder
 
-Write-Output $PathToPythonExe
+# Write-Output $PathToPythonExe
 
 if (!(Test-Path $PathToPythonExe)) {
     Write-Output "python 3.9 not installed! downloading"
     $PythonInstallerPath = (Join-Path $TempFolder $PythonInstallerFilename)
     Invoke-WebRequest $PythonInstallerUrl -OutFile $PythonInstallerPath
     Write-Output "running installer"
-    Start-Process -FilePath $PythonInstallerPath -ArgumentList "/quiet" -Wait
+    Start-Process -FilePath $PythonInstallerPath -ArgumentList "/passive" -Wait # gracias https://stackoverflow.com/a/1742758
     Write-Output "installer done"
 }
 
