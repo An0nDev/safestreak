@@ -48,3 +48,5 @@ Write-Output extracted"
 Write-Output "cleaning up"
 Remove-Item $TempFolder -Recurse
 Write-Output "done!"
+$RunPyLocation = Join-Path $OutSubfolderPath "run.py"
+Start-Process -FilePath "C:\Windows\explorer.exe" -ArgumentList "/select,$RunPyLocation"
