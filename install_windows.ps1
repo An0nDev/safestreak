@@ -43,7 +43,7 @@ if (Test-Path $OutSubfolderPath) {
 
 Write-Output "extracting archive"
 Expand-Archive "$OutZipPath" -DestinationPath "$OutFolder"
-Write-Output extracted"
+Write-Output "extracted"
 
 Write-Output "cleaning up"
 Remove-Item $TempFolder -Recurse
