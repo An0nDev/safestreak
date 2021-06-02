@@ -1,10 +1,12 @@
+$ErrorActionPreference = "Stop"
+
 function New-TemporaryDirectory {
     $parent = [System.IO.Path]::GetTempPath()
     [string] $name = [System.Guid]::NewGuid()
     New-Item -ItemType Directory -Path (Join-Path $parent $name)
 } # gracias https://stackoverflow.com/a/34559554
 
-$PathToPythonExe = $Env:LOCALAPPDATA + "\Programs\Python\Python39\python.exe"
+$PathToPythonExe = Join-Path $Env:LOCALAPPDATA "\Programs\Python\Python39\python.exe"
 $PythonInstallerUrl = "https://www.python.org/ftp/python/3.9.5/python-3.9.5-amd64.exe"
 $PythonInstallerFilename = "python-3.9.5-amd64.exe"
 $TempFolder = New-TemporaryDirectory
@@ -14,6 +16,8 @@ $OutZipName = "safestreak-master.zip"
 $OutFolder = [Environment]::GetFolderPath("MyDocuments") # gracias https://stackoverflow.com/a/24779668
 $OutSubfolderName = "safestreak-master"
 $OutSubfolderPath = Join-Path $OutFolder $OutSubfolderName
+$OutShortcutName = "safestreak.lnk"
+$DesktopPath = [Environment]::GetFolderPath("Desktop")
 # Write-Output $TempFolder
 
 # Write-Output $PathToPythonExe
@@ -45,8 +49,23 @@ Write-Output "extracting archive"
 Expand-Archive "$OutZipPath" -DestinationPath "$OutFolder"
 Write-Output "extracted"
 
+$RunPyLocation = Join-Path $OutSubfolderPath "run.py"
+
+Write-Output "creating shortcut"
+$ShortcutPath = Join-Path $TempFolder $OutShortcutName
+$WshShell = New-Object -comObject WScript.Shell
+$Shortcut = $WshShell.CreateShortcut($ShortcutPath)
+$Shortcut.TargetPath = $PathToPythonExe
+$Shortcut.Arguments = $RunPyLocation
+$Shortcut.Save() # thanks https://stackoverflow.com/a/9701907
+Write-Output "copying to desktop"
+Copy-Item -Path $ShortcutPath -Destination $DesktopPath
+Write-Output "copying to start menu folder"
+Copy-Item -Path $ShortcutPath -Destination (Join-Path $Env:APPDATA "Microsoft\Windows\Start Menu\Programs")
+Write-Output "created and copied shortcut"
+
 Write-Output "cleaning up"
 Remove-Item $TempFolder -Recurse
 Write-Output "done!"
-$RunPyLocation = Join-Path $OutSubfolderPath "run.py"
+
 Start-Process -FilePath "C:\Windows\explorer.exe" -ArgumentList "/select,$RunPyLocation"
