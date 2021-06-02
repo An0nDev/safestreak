@@ -1,8 +1,9 @@
 import copy
 import pathlib, os.path
 import re
+import sys
 
-import watchdog.events, watchdog.observers
+import watchdog.events, watchdog.observers, watchdog.observers.polling
 
 class LogReader:
     log_file_path = pathlib.Path.home () / ".lunarclient" / "offline" / "1.8" / "logs"
@@ -13,9 +14,9 @@ class LogReader:
 
         self.last_size = self._calc_size ()
 
-        self.event_handler = watchdog.events.LoggingEventHandler ()
+        self.event_handler = watchdog.events.FileSystemEventHandler ()
         self.event_handler.on_modified = self._on_modification
-        self.observer = watchdog.observers.Observer ()
+        self.observer = watchdog.observers.polling.PollingObserver () if sys.platform == "win32" else watchdog.observers.Observer ()
         # print (f"scheduling on {self.log_file_path}")
         self.observer.schedule (self.event_handler, str (self.log_file_path))
         self.observer.start ()
@@ -39,15 +40,18 @@ class LogReader:
         # print (f"new size is {new_size}, size diff {size_diff} at offset {offset}")
         with open (self.log_file_full_path_str, "rb") as log_file:
             log_file.seek (offset)
-            new_text = log_file.read (size_diff).decode ()
-            # print (f"new text is {new_text}")
-            lines = new_text.strip ().splitlines ()
-            first = True
-            for line in lines:
-                success = self._feed_line (line, first)
-                if first:
-                    if not success: break
-                    first = False
+            new_text_bytes = log_file.read (size_diff)
+        # print (new_text_bytes)
+        
+        new_text = new_text_bytes.decode ("unicode_escape")
+        # print (f"new text is {new_text}")
+        lines = new_text.strip ().splitlines ()
+        first = True
+        for line in lines:
+            success = self._feed_line (line, first)
+            if first:
+                if not success: break
+                first = False
     def _feed_line (self, line: str, first: bool) -> bool:
         match = re.fullmatch (r"\[[0-9]{2}:[0-9]{2}:[0-9]{2}\] \[Client thread\/INFO\]: \[CHAT\] (?P<message>.+)", line)
         if match is None:
