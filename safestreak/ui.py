@@ -30,6 +30,21 @@ class Container (tkinter.Frame):
     def __init__ (self, master):
         self.app = master
         super ().__init__ (master, **self.app.gen_global_widget_opts (is_container = True))
+
+        username_label = tkinter.Label (self, text = "USERNAME", **self.app.gen_global_widget_opts ())
+        username_label.grid (row = 0, column = 0)
+        star_label = tkinter.Label (self, text = "STAR", **self.app.gen_global_widget_opts ())
+        star_label.grid (row = 0, column = 1)
+        fkdr_label = tkinter.Label (self, text = "FKDR", **self.app.gen_global_widget_opts ())
+        fkdr_label.grid (row = 0, column = 2)
+        index_label = tkinter.Label (self, text = "INDEX", **self.app.gen_global_widget_opts ())
+        index_label.grid (row = 0, column = 3)
+        pin_label = tkinter.Label (self, text = "PIN", **self.app.gen_global_widget_opts ())
+        pin_label.grid (row = 0, column = 4)
+        remove_label = tkinter.Label (self, text = "DEL", **self.app.gen_global_widget_opts ())
+        remove_label.grid (row = 0, column = 5)
+        self.label_row = [username_label, star_label, fkdr_label, index_label, pin_label, remove_label]
+
         self.rows = {}
     def add_row (self, username: str, pinned: bool = False):
         if username in self.rows:
@@ -38,7 +53,7 @@ class Container (tkinter.Frame):
                 row ["pinned"] = True
                 row ["columns"] [4].configure (text = "U")
             return
-        row_index = len (self.rows)
+        row_index = len (self.rows) + 1
 
         username_col = tkinter.Label (self, text = username, **self.app.gen_global_widget_opts ())
         username_col.grid (row = row_index, column = 0)
@@ -48,6 +63,9 @@ class Container (tkinter.Frame):
         if uuid in self.app.COOL_PEOPLE_LIST:
             text_opts ["fg"] = "gold2"
             username_col.configure (fg = "gold2")
+        if is_nick:
+            text_opts ["fg"] = "firebrick1"
+            username_col.configure (fg = "firebrick1")
         star_col = tkinter.Label (self, text = f"{math.floor (stats ['star'])}✫" if not is_nick else "WARN", **text_opts)
         star_col.grid (row = row_index, column = 1)
         fkdr_col = tkinter.Label (self, text = f"{round (stats ['fkdr'], self.app.settings.fkdr_digits)}fkdr" if not is_nick else "NICK", **text_opts)
@@ -66,7 +84,7 @@ class Container (tkinter.Frame):
         self._reindex (sorted_rows)
     @staticmethod
     def _reindex (items):
-        new_row_index = 0
+        new_row_index = 1
         for username, row in items:
             row ["index"] = copy.deepcopy (new_row_index)
             column_index = 0
