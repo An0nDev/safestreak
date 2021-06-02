@@ -69,10 +69,10 @@ class Container (tkinter.Frame):
             username_col.configure (fg = "firebrick1")
         star_col = tkinter.Label (self, text = f"{math.floor (stats ['star'])}✫" if not is_nick else "WARN", **text_opts)
         star_col.grid (row = row_index, column = 1)
-        fkdr_col = tkinter.Label (self, text = f"{round (stats ['fkdr'], self.app.settings.fkdr_digits)}fkdr" if not is_nick else "NICK", **text_opts)
+        fkdr_col = tkinter.Label (self, text = f"{str (round (stats ['fkdr'], self.app.settings.fkdr_digits)).zfill (self.app.settings.fkdr_digits)}fkdr" if not is_nick else "NICK", **text_opts)
         fkdr_col.grid (row = row_index, column = 2)
         index_score = round (self.app.calc_index_score (stats), self.app.settings.index_score_digits) if not is_nick else 999
-        index_col = tkinter.Label (self, text = f"{index_score}I" if not is_nick else "UNK", **text_opts)
+        index_col = tkinter.Label (self, text = f"{str (index_score).zfill (self.app.settings.index_score_digits)}I" if not is_nick else "UNK", **text_opts)
         index_col.grid (row = row_index, column = 3)
         pinned_toggle_col = tkinter.Button (self, text = "U" if pinned else "P", command = lambda: self.toggle_pin (username), **self.app.gen_global_widget_opts ())
         pinned_toggle_col.grid (row = row_index, column = 4)
