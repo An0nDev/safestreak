@@ -23,6 +23,7 @@ class StatsFetcher:
 
         success, og_stats = get_bedwars_stats (uuid = uuid, api_key = self.app.settings.hypixel_api_key)
         if not success: raise Exception (f"couldn't get stats: {og_stats}")
+        if og_stats is None: return None, None
         star = xp_to_level (xp = og_stats ["Experience"] if "Experience" in og_stats else 0)
         final_kills = og_stats ["final_kills_bedwars"] if "final_kills_bedwars" in og_stats else 0
         final_deaths = og_stats ["final_deaths_bedwars"] if "final_deaths_bedwars" in og_stats else 0

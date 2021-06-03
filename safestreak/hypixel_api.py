@@ -10,6 +10,7 @@ def get_bedwars_stats (*, uuid: str, api_key: str):
     if not player_resp ["success"]:
         return False, player_resp ["cause"]
     else:
+        if player_resp ["player"] is None: return True, None
         if "Bedwars" in player_resp ["player"] ["stats"]:
             bw = player_resp ["player"] ["stats"] ["Bedwars"]
             return True, bw
