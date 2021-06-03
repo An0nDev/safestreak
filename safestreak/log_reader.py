@@ -43,7 +43,7 @@ class LogReader:
             new_text_bytes = log_file.read (size_diff)
         # print (new_text_bytes)
         
-        new_text = new_text_bytes.decode ("unicode_escape")
+        new_text = new_text_bytes.decode ("utf-8", "ignore")
         # print (f"new text is {new_text}")
         lines = new_text.strip ().splitlines ()
         first = True
