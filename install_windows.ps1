@@ -42,7 +42,7 @@ Write-Output "downloaded"
 
 if (Test-Path $OutSubfolderPath) {
     Write-Output "removing old install"
-    Move-Item $OutSubfolderPath (Join-Path $TempFolder) # works around a onedrive documents folder
+    Move-Item $OutSubfolderPath $TempFolder # works around a onedrive documents folder
     Remove-Item (Join-Path $TempFolder $OutSubfolderName) -Recurse
 } # remove old install if exists
 
