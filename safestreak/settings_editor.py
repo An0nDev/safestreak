@@ -35,7 +35,7 @@ class SettingsEditor:
             label = tkinter.Label (self.main_window, text = item_name)
             label.grid (row = item_index, column = 0)
             if type (item) == bool:
-                print ("checkbox")
+                # print ("checkbox")
                 variable = tkinter.IntVar ()
                 variable.set (int (item))
                 checkbox = tkinter.Checkbutton (self.main_window, variable = variable)
@@ -43,7 +43,7 @@ class SettingsEditor:
                 checkbox.select () if item else checkbox.deselect ()
                 self.extra [item_name] = (variable, checkbox)
             elif type (item) in (str, int, float):
-                print ("text box")
+                # print ("text box")
                 variable = tkinter.StringVar ()
                 variable.set (str (item))
                 text_box = tkinter.Entry (self.main_window, textvariable = variable)
