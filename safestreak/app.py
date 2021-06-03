@@ -51,5 +51,8 @@ class safestreakApp (tkinter.Tk):
         if not is_container: opts = {**opts, "fg": "white", "font": (self.settings.font_name, math.floor (self.settings.font_size * (1.5 if bigger_text else 1) * self.settings.scale))}
         return opts
     def calc_index_score (self, stats):
-        return ((stats ["star"] / 100) + (stats ["fkdr"] ** 2)) * self.settings.index_score_constant_scale
+        star_base = stats ["star"] / self.settings.star_divisor
+        fkdr_base = stats ["fkdr"] ** self.settings.fkdr_power
+        base = star_base * fkdr_base if self.settings.multiply_star_by_fkdr else star_base + fkdr_base
+        return base * self.settings.index_score_constant_scale
     COOL_PEOPLE_LIST = ["d9f9d8ea4f054a5fac211b51d9e448ad", "3712b4872b2346c38d6774fa3d27b58f", "518d492516a447b4a56213d5465f0eba", "06b57734e6eb4ee3a7b53492d5fbb5e6", "163fe2178bc04749a50c17e0ae51c4a5"]

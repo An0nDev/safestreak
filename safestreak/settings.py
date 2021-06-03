@@ -14,3 +14,6 @@ class Settings:
     fkdr_digits: int = 2
     index_score_constant_scale: float = 20
     index_score_digits: int = 2
+    star_divisor: int = 30
+    fkdr_power: float = 2.0
+    multiply_star_by_fkdr: bool = False
