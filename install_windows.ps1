@@ -44,7 +44,7 @@ if (Test-Path $OutSubfolderPath) {
     Write-Output "removing old install"
     # Remove-Item $OutSubfolderPath -Recurse -Force # -force removes if in onedrive
     $OutSubfolder = Get-Item -LiteralPath $OutSubfolderPath
-    $OutSubfolder.Delete ($true) # thanks https://evotec.xyz/remove-item-access-to-the-cloud-file-is-denied-while-deleting-files-from-onedrive/
+    $OutSubfolder.Delete($true) # thanks https://evotec.xyz/remove-item-access-to-the-cloud-file-is-denied-while-deleting-files-from-onedrive/
 } # remove old install if exists
 
 Write-Output "extracting archive"
