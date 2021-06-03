@@ -42,7 +42,7 @@ Write-Output "downloaded"
 
 if (Test-Path $OutSubfolderPath) {
     Write-Output "removing old install"
-    Remove-Item $OutSubfolderPath -Recurse
+    Remove-Item $OutSubfolderPath -Recurse -Force # -force removes if in onedrive
 } # remove old install if exists
 
 Write-Output "extracting archive"
