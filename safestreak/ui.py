@@ -1,6 +1,7 @@
 import copy
 import math
 import tkinter
+import threading
 from .settings_editor import SettingsEditor
 
 class Controls (tkinter.Frame):
@@ -47,6 +48,7 @@ class Container (tkinter.Frame):
         self.label_row = [username_label, star_label, fkdr_label, index_label, pin_label, remove_label]
 
         self.rows = {}
+        self.row_add_lock = threading.Lock ()
     def add_row (self, username: str, pinned: bool = False):
         if username in self.rows:
             row = self.rows [username]
@@ -54,10 +56,7 @@ class Container (tkinter.Frame):
                 row ["pinned"] = True
                 row ["columns"] [4].configure (text = "U")
             return
-        row_index = len (self.rows) + 1
-
         username_col = tkinter.Label (self, text = username, **self.app.gen_global_widget_opts ())
-        username_col.grid (row = row_index, column = 0)
         stats, uuid = self.app.stats_fetcher.fetch_for (username = username)
         is_nick = stats is None
         text_opts = self.app.gen_global_widget_opts ()
@@ -68,21 +67,25 @@ class Container (tkinter.Frame):
             text_opts ["fg"] = "firebrick1"
             username_col.configure (fg = "firebrick1")
         star_col = tkinter.Label (self, text = f"{math.floor (stats ['star'])}✫" if not is_nick else "WARN", **text_opts)
-        star_col.grid (row = row_index, column = 1)
         fkdr_col = tkinter.Label (self, text = f"{str (round (stats ['fkdr'], self.app.settings.fkdr_digits)).zfill (self.app.settings.fkdr_digits)}fkdr" if not is_nick else "NICK", **text_opts)
-        fkdr_col.grid (row = row_index, column = 2)
         index_score = round (self.app.calc_index_score (stats), self.app.settings.index_score_digits) if not is_nick else 999
         index_col = tkinter.Label (self, text = f"{str (index_score).zfill (self.app.settings.index_score_digits)}I" if not is_nick else "UNK", **text_opts)
-        index_col.grid (row = row_index, column = 3)
         pinned_toggle_col = tkinter.Button (self, text = "U" if pinned else "P", command = lambda: self.toggle_pin (username), **self.app.gen_global_widget_opts ())
-        pinned_toggle_col.grid (row = row_index, column = 4)
         remove_button_col = tkinter.Button (self, text = "X", command = lambda: self.remove_row (username, force = True), **self.app.gen_global_widget_opts ())
-        remove_button_col.grid (row = row_index, column = 5)
 
-        self.rows [username] = {"columns": [username_col, star_col, fkdr_col, index_col, pinned_toggle_col, remove_button_col], "index": row_index, "index_score": index_score, "pinned": pinned}
+        with self.row_add_lock:
+            row_index = len (self.rows) + 1
+            username_col.grid (row = row_index, column = 0)
+            star_col.grid (row = row_index, column = 1)
+            fkdr_col.grid (row = row_index, column = 2)
+            index_col.grid (row = row_index, column = 3)
+            pinned_toggle_col.grid (row = row_index, column = 4)
+            remove_button_col.grid (row = row_index, column = 5)
 
-        sorted_rows = sorted (self.rows.items (), key = lambda username_and_row: username_and_row [1] ["index_score"], reverse = True)
-        self._reindex (sorted_rows)
+            self.rows [username] = {"columns": [username_col, star_col, fkdr_col, index_col, pinned_toggle_col, remove_button_col], "index": row_index, "index_score": index_score, "pinned": pinned}
+
+            sorted_rows = sorted (self.rows.items (), key = lambda username_and_row: username_and_row [1] ["index_score"], reverse = True)
+            self._reindex (sorted_rows)
     @staticmethod
     def _reindex (items):
         new_row_index = 1
@@ -99,15 +102,16 @@ class Container (tkinter.Frame):
         row ["pinned"] = not row ["pinned"]
         row ["columns"] [4].configure (text = "U" if row ["pinned"] else "P")
     def remove_row (self, username, force = False):
-        if username not in self.rows: return
-        row = self.rows [username]
-        if row ["pinned"] and not force: return
-        for column in row ["columns"]:
-            column.grid_forget ()
-        del self.rows [username]
+        with self.row_add_lock:
+            if username not in self.rows: return
+            row = self.rows [username]
+            if row ["pinned"] and not force: return
+            for column in row ["columns"]:
+                column.grid_forget ()
+            del self.rows [username]
 
-        sorted_rows = sorted (self.rows.items (), key = lambda username_and_row: username_and_row [1] ["index_score"], reverse = True)
-        self._reindex (sorted_rows)
+            sorted_rows = sorted (self.rows.items (), key = lambda username_and_row: username_and_row [1] ["index_score"], reverse = True)
+            self._reindex (sorted_rows)
     def clear_rows (self, force = False):
         pins = []
         for username in list (self.rows.keys ()):

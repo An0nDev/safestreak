@@ -1,9 +1,20 @@
 import re
+import threading
 import tkinter
 
 ign_re = "[A-Za-z0-9_]+"
 ign_list_re = "[A-Za-z0-9_, ]+"
 qualified_ign_re = "(?:\[[A-Z\+]*\] )?([A-Za-z0-9_]+)"
+
+def thread_map (function, iterable):
+    threads = []
+    for arg in iterable:
+        thread = threading.Thread (target = function, args = [arg])
+        thread.start ()
+        threads.append (thread)
+    for thread in threads:
+        thread.join ()
+
 
 class ChatProcessor:
     def __init__ (self, app):
@@ -15,7 +26,7 @@ class ChatProcessor:
             # print (f"[!] {', '.join (online_igns)} (len {len (online_igns)}) are online")
             self.app.container.clear_rows ()
             with self.app.container_lock:
-                for online_ign in online_igns: self.app.container.add_row (online_ign)
+                thread_map (lambda online_ign: self.app.container.add_row (online_ign), online_igns)
             return
 
         join_message_parse_result = re.fullmatch (f"(?P<joined_ign>{ign_re}) has joined \([0-9]+\/[0-9]+\)!", chat_message)
@@ -48,7 +59,7 @@ class ChatProcessor:
                 members = list (filter (lambda member: member != '', re.split (r"(?:\[[A-Z\+]*\] )?([A-Za-z0-9_]+) ● *", party_members_parse_result.group ("members_list"))))
                 # print (f"[!] {', '.join (members)} are {party_member_type.lower ()}")
                 with self.app.container_lock:
-                    for member in members: self.app.container.add_row (member, pinned = True)
+                    thread_map (lambda member: self.app.container.add_row (member, pinned = True), members)
         for warp_regex in (f"Party Leader, {qualified_ign_re}, summoned you to their server.", f"You summoned {qualified_ign_re} to your server."):
             warp_parse_result = re.fullmatch (warp_regex, chat_message)
             if warp_parse_result is not None:
