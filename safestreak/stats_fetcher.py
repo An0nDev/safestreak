@@ -1,6 +1,7 @@
 import json
 import os.path
 import time
+import threading
 
 from .hypixel_api import get_player_uuid, get_bedwars_stats
 from .bedwars_calcs import xp_to_level
@@ -14,12 +15,15 @@ class StatsFetcher:
         else:
             self.cache = {}
             with open (self.stats_cache_file_full_path, "w+") as cache_file: json.dump (self.cache, cache_file)
-    def fetch_for (self, *, username: str):
-        uuid = get_player_uuid (username = username)
-        if uuid is None: return None, None
 
-        if (uuid in self.cache) and (time.time () < (self.cache [uuid] ["at"] + self.app.settings.stats_cache_max_time_seconds)):
-            return self.cache [uuid] ["stats"], uuid
+        self.uuid_yoink_lock = threading.Lock ()
+    def fetch_for (self, *, username: str):
+        with self.uuid_yoink_lock:
+            uuid = get_player_uuid (username = username)
+            if uuid is None: return None, None
+
+            if (uuid in self.cache) and (time.time () < (self.cache [uuid] ["at"] + self.app.settings.stats_cache_max_time_seconds)):
+                return self.cache [uuid] ["stats"], uuid
 
         success, og_stats = get_bedwars_stats (uuid = uuid, api_key = self.app.settings.hypixel_api_key)
         if not success: raise Exception (f"couldn't get stats: {og_stats}")
@@ -31,9 +35,10 @@ class StatsFetcher:
             "star": star,
             "fkdr": (final_kills / final_deaths) if final_deaths > 0 else 0,
         }
-        self.cache [uuid] = {
-            "at": time.time (),
-            "stats": stats
-        }
-        with open (self.stats_cache_file_full_path, "w") as cache_file: json.dump (self.cache, cache_file)
+        with self.uuid_yoink_lock:
+            self.cache [uuid] = {
+                "at": time.time (),
+                "stats": stats
+            }
+            with open (self.stats_cache_file_full_path, "w") as cache_file: json.dump (self.cache, cache_file)
         return stats, uuid
