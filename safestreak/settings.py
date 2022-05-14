@@ -17,3 +17,4 @@ class Settings:
     star_divisor: int = 30
     fkdr_power: float = 2.0
     multiply_star_by_fkdr: bool = False
+    memery: bool = True

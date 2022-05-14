@@ -15,7 +15,12 @@ class SettingsEditor:
         if os.path.exists (file_path):
             with open (file_path, "r") as in_file:
                 settings_dict = json.load (in_file)
-            return Settings (**settings_dict)
+            defaults = {item: getattr (Settings, item) for item in [dir_item for dir_item in dir (Settings) if not (dir_item.startswith ("__") and dir_item.endswith ("__"))]}
+            settings_dict_with_new_items = defaults | settings_dict
+            settings = Settings (**settings_dict_with_new_items)
+            if settings_dict != settings_dict_with_new_items:
+                SettingsEditor.save (settings = settings, file_path = file_path)
+            return settings
         else:
             settings = Settings ()
             SettingsEditor.save (settings = settings, file_path = file_path)

@@ -26,11 +26,14 @@ class safestreakApp (tkinter.Tk):
         self.configure (bg = "black")
         self.wm_title ("safestreak")
 
-        self.top_text = tkinter.Label (self, text = "TOP TEXT", bg = "black", fg = "white", font = ("Impact", 36))
-        self.top_text.grid (row = 0, sticky = "we")
+        self.current_row = 0
+
+        if self.settings.memery:
+            self.top_text = tkinter.Label (self, text = "TOP TEXT", bg = "black", fg = "white", font = ("Impact", 36))
+            self.top_text.grid (row = self.next_row (), sticky = "we")
 
         self.title_text = tkinter.Label (self, text = "safestreak by an0ndev; gl and enjoy <3", **self.gen_global_widget_opts (bigger_text = True))
-        self.title_text.grid (row = 1, sticky = "we")
+        self.title_text.grid (row = self.next_row (), sticky = "we")
 
         self.stats_fetcher = StatsFetcher (self)
         self.chat_processor = ChatProcessor (self)
@@ -39,13 +42,17 @@ class safestreakApp (tkinter.Tk):
         self.container_lock = threading.Lock ()
         self.container = Container (self)
         self.controls = Controls (self)
-        self.controls.grid (row = 2, sticky = "we")
-        self.container.grid (row = 3, sticky = "we")
+        self.controls.grid (row = self.next_row (), sticky = "we")
+        self.container.grid (row = self.next_row (), sticky = "we")
         with self.container_lock:
             self.container.add_row (self.settings.own_ign, pinned = True)
 
-        self.bottom_text = tkinter.Label (self, text = "BOTTOM TEXT", bg = "black", fg = "white", font = ("Impact", 36))
-        self.bottom_text.grid (row = 4, sticky = "we")
+        if self.settings.memery:
+            self.bottom_text = tkinter.Label (self, text = "BOTTOM TEXT", bg = "black", fg = "white", font = ("Impact", 36))
+            self.bottom_text.grid (row = self.next_row (), sticky = "we")
+    def next_row (self):
+        self.current_row += 1
+        return self.current_row - 1
     def gen_global_widget_opts (self, is_container = False, bigger_text = False):
         opts = {"bg": "black"}
         if not is_container: opts = {**opts, "fg": "white", "font": (self.settings.font_name, math.floor (self.settings.font_size * (1.5 if bigger_text else 1) * self.settings.scale))}
