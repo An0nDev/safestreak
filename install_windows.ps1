@@ -6,7 +6,7 @@ function New-TemporaryDirectory {
     New-Item -ItemType Directory -Path (Join-Path $parent $name)
 } # gracias https://stackoverflow.com/a/34559554
 
-$PathToPythonExe = Join-Path $Env:LOCALAPPDATA "\Programs\Python\Python39\python.exe"
+$PathToPythonExe = Join-Path $Env:LOCALAPPDATA "\Programs\Python\Python39\pythonw.exe"
 $PythonInstallerUrl = "https://www.python.org/ftp/python/3.9.5/python-3.9.5-amd64.exe"
 $PythonInstallerFilename = "python-3.9.5-amd64.exe"
 $TempFolder = New-TemporaryDirectory
