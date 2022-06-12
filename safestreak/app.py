@@ -4,12 +4,15 @@ import threading
 import tkinter
 import pathlib
 
+from .api_key_input_dialog import prompt_for_api_key
 from .chat_processor import ChatProcessor
 from .log_reader import LogReader
 from .settings import Settings
 from .stats_fetcher import StatsFetcher
 from .ui import Controls, Container
 from .settings_editor import SettingsEditor
+from .hypixel_api import InvalidAPIKeyException, test
+
 
 class safestreakApp (tkinter.Tk):
     def __init__ (self):
@@ -44,19 +47,34 @@ class safestreakApp (tkinter.Tk):
         self.controls = Controls (self)
         self.controls.grid (row = self.next_row (), sticky = "we")
         self.container.grid (row = self.next_row (), sticky = "we")
-        with self.container_lock:
-            self.container.add_row (self.settings.own_ign, pinned = True)
 
         if self.settings.memery:
             self.bottom_text = tkinter.Label (self, text = "BOTTOM TEXT", bg = "black", fg = "white", font = ("Impact", 36))
             self.bottom_text.grid (row = self.next_row (), sticky = "we")
+
+    def run(self):
+        self.wm_withdraw()
+        updated_api_key, username = prompt_for_api_key(self, self.settings.hypixel_api_key)
+        if updated_api_key is not None:
+            self.settings.hypixel_api_key = updated_api_key
+        self.settings.own_ign = username
+        SettingsEditor.save(self.settings, file_path=self.settings_path)
+        self.wm_deiconify()
+
+        with self.container_lock:
+            self.container.add_row (self.settings.own_ign, pinned = True)
+
+        self.mainloop()
+
     def next_row (self):
         self.current_row += 1
         return self.current_row - 1
+
     def gen_global_widget_opts (self, is_container = False, bigger_text = False):
         opts = {"bg": "black"}
         if not is_container: opts = {**opts, "fg": "white", "font": (self.settings.font_name, math.floor (self.settings.font_size * (1.5 if bigger_text else 1) * self.settings.scale))}
         return opts
+
     def calc_index_score (self, stats):
         star_base = stats ["star"] / self.settings.star_divisor
         fkdr_base = stats ["fkdr"] ** self.settings.fkdr_power

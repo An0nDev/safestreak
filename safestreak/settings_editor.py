@@ -1,18 +1,20 @@
 import json
-import os.path
+import pathlib
 import tkinter
 from .settings import Settings
 
+DEFAULT_FILE_PATH = pathlib.Path.cwd() / "settings.json"
+
 class SettingsEditor:
     @staticmethod
-    def save (settings: Settings, *, file_path: str = "settings.json"):
+    def save (settings: Settings, *, file_path: pathlib.Path = DEFAULT_FILE_PATH):
         item_list = [dir_item for dir_item in dir (settings) if not (dir_item.startswith ("__") and dir_item.endswith ("__"))]
         items = {item: getattr (settings, item) for item in item_list}
         with open (file_path, "w") as out_file:
             json.dump (items, out_file)
     @staticmethod
-    def load (*, file_path = "settings.json"):
-        if os.path.exists (file_path):
+    def load (*, file_path: pathlib.Path = DEFAULT_FILE_PATH):
+        if file_path.exists():
             with open (file_path, "r") as in_file:
                 settings_dict = json.load (in_file)
             defaults = {item: getattr (Settings, item) for item in [dir_item for dir_item in dir (Settings) if not (dir_item.startswith ("__") and dir_item.endswith ("__"))]}
