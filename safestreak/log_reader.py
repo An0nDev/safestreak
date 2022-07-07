@@ -6,7 +6,7 @@ import sys
 import watchdog.events, watchdog.observers, watchdog.observers.polling
 
 class LogReader:
-    log_file_path = pathlib.Path.home () / ".lunarclient" / "offline" / "1.8" / "logs"
+    log_file_path = pathlib.Path.home () / ".lunarclient" / "offline" / "1.8.9" / "logs"
     log_file_name = "latest.log"
     log_file_full_path_str = str (log_file_path / log_file_name)
     def __init__ (self, app):
