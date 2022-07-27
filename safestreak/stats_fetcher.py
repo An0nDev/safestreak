@@ -15,12 +15,17 @@ class StatsFetcher:
         self.app = app
         self.stats_cache_file_full_path = self.app.data_path / self.app.settings.stats_cache_file_path
         if os.path.exists (self.stats_cache_file_full_path):
-            with open (self.stats_cache_file_full_path, "r") as cache_file: self.cache = json.load (cache_file)
+            with open (self.stats_cache_file_full_path, "r") as cache_file:
+                try:
+                    self.cache = json.load (cache_file)
+                except json.decoder.JSONDecodeError:
+                    self._make_empty_cache()
         else:
-            self.cache = {}
-            with open (self.stats_cache_file_full_path, "w+") as cache_file: json.dump (self.cache, cache_file)
-
+            self._make_empty_cache()
         self.uuid_yoink_lock = threading.Lock ()
+    def _make_empty_cache(self):
+        self.cache = {}
+        with open (self.stats_cache_file_full_path, "w+") as cache_file: json.dump (self.cache, cache_file)
     def fetch_for (self, *, username: str) -> (dict, str):
         with self.uuid_yoink_lock:
             uuid = get_player_uuid (username = username)
