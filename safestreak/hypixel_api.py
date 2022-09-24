@@ -63,6 +63,6 @@ def get_player_uuid (*, username: str):
 
 @functools.lru_cache(maxsize=None)
 def get_player_username(*, uuid: str):
-    response = requests.get(f"https://api.mojang.com/user/profiles/{uuid}/names")
+    response = requests.get(f"https://sessionserver.mojang.com/session/minecraft/profile/{uuid}")
     response.raise_for_status()
-    return response.json()[-1]["name"]
+    return response.json()["name"]
